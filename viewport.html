@@ -6,6 +6,9 @@
     const a = window.visualViewport;
     window.visualViewport.addEventListener("resize", function () {
       var l = a.width * a.scale;
+      let q = "device-width";
+      console.log("l: ", l);
+      console.log("device-width: ", q);
       l = 300 >= l ? 300 : 700 <= l ? 700 : "device-width";
       b = document.querySelector("meta[name=viewport]").content = "width=" + l;
     })
