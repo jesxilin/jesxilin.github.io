@@ -7,21 +7,13 @@
     const b = window.visualViewport;
     b.addEventListener("resize", function() {
         console.log("Resize Event ------------------------------");
+        console.log("b.width = ", b.width, "b.scale = ", b.scale);
         var q = Math.round(b.width * b.scale);
         console.log("Math.round(b.width * b.scale) = ", q);
         q = 300 >= q ? 300 : 700 <= q ? 700 : "device-width";
         console.log("q = ", q, "\n");
         e !== q && ((f || (f = document.querySelector("meta[name=viewport]"))).content = "width=" + (e = q))
     })
-    // const a = window.visualViewport;
-    // window.visualViewport.addEventListener("resize", function () {
-    //   var l = a.width * a.scale;
-    //   let q = "device-width";
-    //   console.log("Trying to resize... l: ", l, "a.width: ", a.width, "a.scale: ", a.scale);
-    //   // console.log("device-width: ", q);
-    //   l = 300 >= l ? 300 : 700 <= l ? 700 : "device-width";
-    //   // b = document.querySelector("meta[name=viewport]").content = "width=" + l;
-    // })
   </script>
   <style>
     .gnt_flp {
