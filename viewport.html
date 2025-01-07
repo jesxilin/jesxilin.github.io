@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head>
+  <meta name=viewport content="width=device-width,initial-scale=1,minimum-scale=1" />
+  <script>
+    const a = window.visualViewport;
+    window.visualViewport.addEventListener("resize", function () {
+      var l = a.width * a.scale;
+      l = 300 >= l ? 300 : 700 <= l ? 700 : "device-width";
+      b = document.querySelector("meta[name=viewport]").content = "width=" + l;
+    })
+  </script>
+  <style>
+    .gnt_flp {
+      min-height: 300px;
+    }
+  </style>
+</head>
+<body>
+  <h1 class=gnt_flp>jesxillin</h1>
+</body>
+</html>
