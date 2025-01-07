@@ -7,10 +7,10 @@
     window.visualViewport.addEventListener("resize", function () {
       var l = a.width * a.scale;
       let q = "device-width";
-      console.log("l: ", l, "a.width: ", a.width, "a.scale: ", a.scale);
+      console.log("Trying to resize... l: ", l, "a.width: ", a.width, "a.scale: ", a.scale);
       // console.log("device-width: ", q);
-      l = 300 >= l ? 300 : 700 <= l ? 700 : 650; // "device-width"
-      b = document.querySelector("meta[name=viewport]").content = "width=" + l;
+      l = 300 >= l ? 300 : 700 <= l ? 700 : "device-width";
+      // b = document.querySelector("meta[name=viewport]").content = "width=" + l;
     })
   </script>
   <style>
