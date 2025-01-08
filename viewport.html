@@ -7,17 +7,19 @@
     const b = window.visualViewport;
     b.addEventListener("resize", function() {
         console.log("Resize Event ------------------------------");
-        const width = window.innerWidth;
-        console.log("Device width:", width);
+        console.log("window.innerWidth:", window.innerWidth);
+        console.log("Device width:", device-width);
         const screenWidth = screen.width;
         console.log("Screen width:", screenWidth);
         console.log("E width:", e);
-        console.log("b.width = ", b.width, "b.scale = ", b.scale);
+        console.log("b.width = ", b.width)
+        console.log("b.scale = ", b.scale);
         var q = Math.round(b.width * b.scale);
         console.log("Math.round(b.width * b.scale) = ", q);
         q = 300 >= q ? 300 : 700 <= q ? 700 : "device-width";
-        console.log("q = ", q, "\n");
+        console.log("q = ", q);
         e !== q && ((f || (f = document.querySelector("meta[name=viewport]"))).content = "width=" + (e = q))
+        console.log("New width is ", window.innerWidth);
     })
   </script>
   <style>
