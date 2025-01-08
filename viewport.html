@@ -7,6 +7,11 @@
     const b = window.visualViewport;
     b.addEventListener("resize", function() {
         console.log("Resize Event ------------------------------");
+        const width = window.innerWidth;
+        console.log("Device width:", width);
+        const screenWidth = screen.width;
+        console.log("Screen width:", screenWidth);
+        console.log("E width:", e);
         console.log("b.width = ", b.width, "b.scale = ", b.scale);
         var q = Math.round(b.width * b.scale);
         console.log("Math.round(b.width * b.scale) = ", q);
