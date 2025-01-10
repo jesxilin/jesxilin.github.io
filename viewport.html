@@ -1,14 +1,14 @@
 <!doctype html>
 <html>
 <head>
-  <meta name=viewport content="width=device-width,initial-scale=1,minimum-scale=1" />
+  <meta name=viewport content="width=device-width" />
   <script>
+    // initial-scale=1,minimum-scale=1
     let e = "device-width", f;
     const b = window.visualViewport;
     b.addEventListener("resize", function() {
         console.log("Resize Event ------------------------------");
         console.log("window.innerWidth:", window.innerWidth);
-        // console.log("Device width:", device-width);
         console.log("Screen width:", screen.width);
         console.log("E width:", e);
         console.log("b.width = ", b.width)
@@ -19,6 +19,7 @@
         console.log("q = ", q);
         e !== q && ((f || (f = document.querySelector("meta[name=viewport]"))).content = "width=" + (e = q))
         console.log("New width is ", window.innerWidth);
+        console.log("New e should be q ", e);
     })
   </script>
   <style>
