@@ -5,7 +5,7 @@
   <script>
     let e = "device-width", f;
     const b = window.visualViewport;
-    b.addEventListener("resize", function() {
+    window.addEventListener("resize", function() {
         console.log("Resize Event ------------------------------");
         console.log("window.innerWidth:", window.innerWidth);
         console.log("Screen width:", screen.width);
