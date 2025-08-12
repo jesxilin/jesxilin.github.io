@@ -1,9 +1,23 @@
-<!DOCTYPE html>
+<!DOCTYPE html> <!-- webkit-test-runner [ useFlexibleViewport=true ] -->
+
 <html>
-    <head>
-        <meta name="viewport" content="interactive-widget=overlays-content" />
-    </head>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            height: 100%;
+        }
+        .fixed {
+            position: absolute;
+            background-color: silver;
+            top: 20vh;
+            padding: 10px;
+        }
+    </style>
+</head>
 <body>
-    <h1>jesxillin</h1>
+<div class="fixed">
+    <input id="input" type="text"/>
+</div>
 </body>
 </html>
