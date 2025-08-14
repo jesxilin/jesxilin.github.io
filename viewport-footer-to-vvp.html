@@ -1,29 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Viewport Footer Test</title>
     <style>
-        body {
+        * {
             margin: 0;
-            height: 200vh; /* Make page scrollable */
+            padding: 0;
+            box-sizing: border-box;
         }
-        
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .content {
+            padding-bottom: 80px; /* Space for footer */
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
         .footer {
             position: fixed;
             bottom: 0;
             left: 0;
-            width: 100%;
-            height: 50px;
-            background: red;
+            right: 0;
+            height: 60px;
+            background-color: #333;
             color: white;
-            text-align: center;
-            line-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
         }
     </style>
 </head>
 <body>
-    <div style="height: 100px; background: lightblue;">Content</div>
-    <input id="input" type="text"/>
-    <div class="footer">Footer</div>
+    <div class="content">
+        <h1>Visual Viewport Test</h1>
+        <p>Type in the input below to test the footer behavior:</p>
+        <input type="text" placeholder="Type here to invoke keyboard...">
+        <p>The footer should appear above the keyboard when it's shown.</p>
+    </div>
+
+    <div class="footer" id="footer">
+        Footer Content
+    </div>
+
+    <script>
+        // Adjust footer position based on visual viewport
+        function updateFooterPosition() {
+            const footer = document.getElementById('footer');
+            const visualViewport = window.visualViewport;
+            
+            if (visualViewport) {
+                const offsetY = window.innerHeight - visualViewport.height;
+                footer.style.transform = `translateY(-${offsetY}px)`;
+            }
+        }
+
+        // Listen for visual viewport changes
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', updateFooterPosition);
+            window.visualViewport.addEventListener('scroll', updateFooterPosition);
+        }
+
+        // Fallback for older browsers
+        window.addEventListener('resize', updateFooterPosition);
+    </script>
 </body>
 </html>
