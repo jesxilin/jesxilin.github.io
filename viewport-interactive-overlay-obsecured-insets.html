@@ -1,0 +1,265 @@
+
+<html>
+	<head>
+		<style>
+	html {
+		zoom: 0.5 !important;
+		height: 100% !important;
+		transition: background 0.2s;
+		background: #BFC8CF;
+	}
+	body {
+		height: 100% !important;
+	}
+</style>
+		
+	</head>
+	<body>
+		<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=overlays-content">
+    <title>Obscured Insets Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Simulated system UI elements */
+        .status-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 0px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            z-index: 1000;
+            transition: height 0.3s ease;
+        }
+
+        .navigation-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 0px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: height 0.3s ease;
+        }
+
+        .notch {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0px;
+            height: 0px;
+            background-color: black;
+            border-radius: 0 0 15px 15px;
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+
+        /* Main content area */
+        .content {
+            position: absolute;
+            top: var(--inset-top, 0px);
+            bottom: var(--inset-bottom, 0px);
+            left: var(--inset-left, 0px);
+            right: var(--inset-right, 0px);
+            background: linear-gradient(45deg, #4CAF50, #2196F3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            transition: all 0.3s ease;
+            padding: 20px;
+        }
+
+        .test-button {
+            background-color: white;
+            color: #333;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+
+        .test-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .test-button:active {
+            transform: translateY(0);
+        }
+
+        .inset-info {
+            background-color: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+
+        /* Different inset states */
+        .state-normal {
+            --inset-top: 0px;
+            --inset-bottom: 0px;
+            --inset-left: 0px;
+            --inset-right: 0px;
+        }
+
+        .state-status-bar {
+            --inset-top: 44px;
+            --inset-bottom: 0px;
+            --inset-left: 0px;
+            --inset-right: 0px;
+        }
+
+        .state-navigation {
+            --inset-top: 0px;
+            --inset-bottom: 60px;
+            --inset-left: 0px;
+            --inset-right: 0px;
+        }
+
+        .state-notch {
+            --inset-top: 40px;
+            --inset-bottom: 0px;
+            --inset-left: 0px;
+            --inset-right: 0px;
+        }
+
+        .state-full {
+            --inset-top: 44px;
+            --inset-bottom: 60px;
+            --inset-left: 0px;
+            --inset-right: 0px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Simulated system UI elements -->
+    <div class="status-bar" id="statusBar">
+        <span>9:41 AM</span>
+        <span>100% 🔋</span>
+    </div>
+    
+    <div class="notch" id="notch"></div>
+    
+    <div class="navigation-bar" id="navigationBar">
+        <span>⬅️ Back | 🏠 Home | ⚙️ Menu</span>
+    </div>
+
+    <!-- Main content -->
+    <div class="content state-normal" id="content">
+        <h1>Obscured Insets Test</h1>
+        <p>Click the buttons below to simulate different system UI states</p>
+        
+        <div class="inset-info" id="insetInfo">
+            Current Insets: Top: 0px, Bottom: 0px
+        </div>
+         <div class="inset-info" id="vvpInfo">
+            Current VVP: 
+        </div>
+
+        <button class="test-button" onclick="setInsetState('normal')">No Insets</button>
+        <button class="test-button" onclick="setInsetState('status-bar')">Status Bar</button>
+        <button class="test-button" onclick="setInsetState('navigation')">Navigation Bar</button>
+        <button class="test-button" onclick="setInsetState('notch')">Notch/Dynamic Island</button>
+        <button class="test-button" onclick="setInsetState('full')">All System UI</button>
+    </div>
+
+    <script>
+        function setInsetState(state) {
+            const content = document.getElementById('content');
+            const statusBar = document.getElementById('statusBar');
+            const navigationBar = document.getElementById('navigationBar');
+            const notch = document.getElementById('notch');
+            const insetInfo = document.getElementById('insetInfo');
+
+            // Remove all state classes
+            content.className = 'content';
+            
+            // Reset all system UI elements
+            statusBar.style.height = '0px';
+            navigationBar.style.height = '0px';
+            notch.style.width = '0px';
+            notch.style.height = '0px';
+
+            let topInset = 0, bottomInset = 0;
+
+            switch(state) {
+                case 'normal':
+                    content.classList.add('state-normal');
+                    break;
+                
+                case 'status-bar':
+                    content.classList.add('state-status-bar');
+                    statusBar.style.height = '44px';
+                    topInset = 44;
+                    break;
+                
+                case 'navigation':
+                    content.classList.add('state-navigation');
+                    navigationBar.style.height = '60px';
+                    bottomInset = 60;
+                    break;
+                
+                case 'notch':
+                    content.classList.add('state-notch');
+                    notch.style.width = '150px';
+                    notch.style.height = '40px';
+                    topInset = 40;
+                    break;
+                
+                case 'full':
+                    content.classList.add('state-full');
+                    statusBar.style.height = '44px';
+                    navigationBar.style.height = '60px';
+                    topInset = 44;
+                    bottomInset = 60;
+                    break;
+            }
+
+            // Update inset info display
+            insetInfo.innerHTML = `Current Insets: Top: ${topInset}px, Bottom: ${bottomInset}px`;
+            vvpInfo.innerHTML = `Current VVP: ` + JSON.stringify(window.visualViewport.width) + `, ` + JSON.stringify(window.visualViewport.height);
+        }
+
+        // Initialize with normal state
+        setInsetState('normal');
+    </script>
+</body>
+</html>
+
+		<script></script>
+	</body>
+</html>
