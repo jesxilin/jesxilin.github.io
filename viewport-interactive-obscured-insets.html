@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obscured Insets & Viewport Test</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        .info-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .viewport-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 600px) {
+            .viewport-info {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .viewport-section {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .viewport-section h3 {
+            margin-top: 0;
+            color: #FFD700;
+        }
+        
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .metric:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-label {
+            font-weight: 500;
+        }
+        
+        .metric-value {
+            font-family: 'Monaco', 'Menlo', monospace;
+            color: #90EE90;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .test-inputs {
+            display: grid;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            backdrop-filter: blur(5px);
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #FFD700;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .color-blocks {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .color-block {
+            height: 150px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .red { background: linear-gradient(45deg, #FF6B6B, #FF8E53); }
+        .blue { background: linear-gradient(45deg, #4ECDC4, #44A08D); }
+        .green { background: linear-gradient(45deg, #A8E6CF, #7FCDCD); }
+        .purple { background: linear-gradient(45deg, #C7CEEA, #B8B8FF); }
+        
+        .log {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .timestamp {
+            color: #FFD700;
+            margin-right: 10px;
+        }
+        
+        .warning {
+            background: rgba(255, 193, 7, 0.2);
+            border-left: 4px solid #FFC107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .success {
+            background: rgba(40, 167, 69, 0.2);
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="info-panel">
+            <h1>🔍 Obscured Insets & Viewport Test</h1>
+            <p>This page tests obscured insets behavior and displays comprehensive viewport information.</p>
+            
+            <div id="webkit-status" class="warning">
+                <strong>⚠️ WebKit Status:</strong> <span id="webkit-detection">Detecting...</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button onclick="setObscuredInsets(0, 0, 0, 0)">Clear Insets</button>
+            <button onclick="setObscuredInsets(50, 0, 0, 0)">Top: 50px</button>
+            <button onclick="setObscuredInsets(0, 0, 200, 0)">Bottom: 200px</button>
+            <button onclick="setObscuredInsets(0, 30, 0, 30)">Sides: 30px</button>
+            <button onclick="setObscuredInsets(44, 20, 300, 20)">All Sides</button>
+            <button onclick="simulateKeyboard()">Simulate Keyboard</button>
+            <button onclick="clearLog()">Clear Log</button>
+        </div>
+
+        <div class="viewport-info">
+            <div class="viewport-section">
+                <h3>📐 Layout Viewport</h3>
+                <div id="layout-viewport">
+                    <div class="metric">
+                        <span class="metric-label">Width:</span>
+                        <span class="metric-value" id="layout-width">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Height:</span>
+                        <span class="metric-value" id="layout-height">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Inner Width:</span>
+                        <span class="metric-value" id="inner-width">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Inner Height:</span>
+                        <span class="metric-value" id="inner-height">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Document Width:</span>
+                        <span class="metric-value" id="doc-width">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Document Height:</span>
+                        <span class="metric-value" id="doc-height">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="viewport-section">
+                <h3>👁️ Visual Viewport</h3>
+                <div id="visual-viewport">
+                    <div class="metric">
+                        <span class="metric-label">Width:</span>
+                        <span class="metric-value" id="visual-width">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Height:</span>
+                        <span class="metric-value" id="visual-height">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Offset Top:</span>
+                        <span class="metric-value" id="visual-offset-top">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Offset Left:</span>
+                        <span class="metric-value" id="visual-offset-left">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Scale:</span>
+                        <span class="metric-value" id="visual-scale">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Page Top:</span>
+                        <span class="metric-value" id="visual-page-top">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <h3>🎛️ Test Controls</h3>
+            <div class="test-inputs">
+                <input type="text" placeholder="Text input (triggers keyboard)" id="text-input">
+                <input type="email" placeholder="Email input" id="email-input">
+                <textarea placeholder="Text area for longer content" rows="3" id="textarea"></textarea>
+                <select id="select">
+                    <option>Select option 1</option>
+                    <option>Select option 2</option>
+                    <option>Select option 3</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="color-blocks">
+            <div class="color-block red">Red Block</div>
+            <div class="color-block blue">Blue Block</div>
+            <div class="color-block green">Green Block</div>
+            <div class="color-block purple">Purple Block</div>
+        </div>
+
+        <div class="info-panel">
+            <h3>📊 Current Measurements</h3>
+            <div id="measurements">
+                <div class="metric">
+                    <span class="metric-label">Viewport Difference:</span>
+                    <span class="metric-value" id="viewport-diff">-</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Available Height:</span>
+                    <span class="metric-value" id="available-height">-</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Scroll Position:</span>
+                    <span class="metric-value" id="scroll-position">-</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Device Pixel Ratio:</span>
+                    <span class="metric-value" id="device-pixel-ratio">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <h3>📝 Event Log</h3>
+            <div id="log" class="log">
+                <div class="log-entry">
+                    <span class="timestamp">--:--:--</span>
+                    Log initialized...
+                </div>
+            </div>
+        </div>
+
+        <div style="height: 200px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); border-radius: 10px; margin: 20px 0;">
+            <h2>🏁 End of Content</h2>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentInsets = { top: 0, left: 0, bottom: 0, right: 0 };
+        let logCount = 0;
+
+        // Detect WebKit environment
+        function detectWebKit() {
+            const isWebKit = /WebKit/i.test(navigator.userAgent);
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const isSafari = /Safari/i.test(navigator.userAgent) && !/Chrome/i.test(navigator.userAgent);
+            
+            const statusElement = document.getElementById('webkit-detection');
+            const statusContainer = document.getElementById('webkit-status');
+            
+            if (isIOS && isWebKit) {
+                statusElement.textContent = 'iOS WebKit detected - Obscured insets may be available';
+                statusContainer.className = 'success';
+            } else if (isWebKit) {
+                statusElement.textContent = 'WebKit detected - Limited obscured insets support';
+                statusContainer.className = 'warning';
+            } else {
+                statusElement.textContent = 'Non-WebKit browser - Obscured insets not supported';
+                statusContainer.className = 'warning';
+            }
+            
+            log(`Browser detection: WebKit=${isWebKit}, iOS=${isIOS}, Safari=${isSafari}`);
+        }
+
+        // Logging function
+        function log(message) {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `<span class="timestamp">${timestamp}</span>${message}`;
+            logElement.appendChild(logEntry);
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            console.log(`[${timestamp}] ${message}`);
+            logCount++;
+        }
+
+        function clearLog() {
+            const logElement = document.getElementById('log');
+            logElement.innerHTML = '<div class="log-entry"><span class="timestamp">--:--:--</span>Log cleared...</div>';
+            logCount = 0;
+        }
+
+        // Set obscured insets (attempts multiple methods)
+        function setObscuredInsets(top, left, bottom, right) {
+            currentInsets = { top, left, bottom, right };
+            
+            log(`🎯 Attempting to set obscured insets: T:${top} L:${left} B:${bottom} R:${right}`);
+            
+            // Method 1: Try webkit message handler (if available)
+            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.obscuredInsets) {
+                try {
+                    window.webkit.messageHandlers.obscuredInsets.postMessage({
+                        top: top,
+                        left: left,
+                        bottom: bottom,
+                        right: right
+                    });
+                    log('✅ Used webkit.messageHandlers.obscuredInsets');
+                } catch (e) {
+                    log(`❌ webkit.messageHandlers.obscuredInsets failed: ${e.message}`);
+                }
+            }
+            
+            // Method 2: Try direct window method (if injected by native code)
+            if (typeof window.setObscuredInsets === 'function') {
+                try {
+                    window.setObscuredInsets(top, left, bottom, right);
+                    log('✅ Used window.setObscuredInsets()');
+                } catch (e) {
+                    log(`❌ window.setObscuredInsets() failed: ${e.message}`);
+                }
+            }
+            
+            // Method 3: Try postMessage to parent (if in iframe)
+            if (window.parent !== window) {
+                try {
+                    window.parent.postMessage({
+                        type: 'setObscuredInsets',
+                        insets: { top, left, bottom, right }
+                    }, '*');
+                    log('✅ Posted message to parent window');
+                } catch (e) {
+                    log(`❌ postMessage to parent failed: ${e.message}`);
+                }
+            }
+            
+            // Method 4: Simulate with CSS (visual approximation)
+            simulateInsetsWithCSS(top, left, bottom, right);
+            
+            // Update measurements after a brief delay
+            setTimeout(() => {
+                updateViewportInfo();
+                log(`📊 Viewport measurements updated after inset change`);
+            }, 100);
+        }
+
+        // Simulate insets with CSS for visual feedback
+        function simulateInsetsWithCSS(top, left, bottom, right) {
+            let style = document.getElementById('inset-simulation');
+            if (!style) {
+                style = document.createElement('style');
+                style.id = 'inset-simulation';
+                document.head.appendChild(style);
+            }
+            
+            if (top || left || bottom || right) {
+                style.textContent = `
+                    body::before {
+                        content: '';
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        pointer-events: none;
+                        z-index: 9999;
+                        box-shadow: 
+                            inset 0 ${top}px 0 0 rgba(255, 0, 0, 0.3),
+                            inset ${left}px 0 0 0 rgba(0, 255, 0, 0.3),
+                            inset 0 -${bottom}px 0 0 rgba(0, 0, 255, 0.3),
+                            inset -${right}px 0 0 0 rgba(255, 255, 0, 0.3);
+                    }
+                `;
+                log(`🎨 Applied CSS simulation overlay`);
+            } else {
+                style.textContent = '';
+                log(`🎨 Removed CSS simulation overlay`);
+            }
+        }
+
+        // Update viewport information
+        function updateViewportInfo() {
+            // Layout viewport
+            document.getElementById('layout-width').textContent = `${document.documentElement.clientWidth}px`;
+            document.getElementById('layout-height').textContent = `${document.documentElement.clientHeight}px`;
+            document.getElementById('inner-width').textContent = `${window.innerWidth}px`;
+            document.getElementById('inner-height').textContent = `${window.innerHeight}px`;
+            document.getElementById('doc-width').textContent = `${document.documentElement.scrollWidth}px`;
+            document.getElementById('doc-height').textContent = `${document.documentElement.scrollHeight}px`;
+            
+            // Visual viewport
+            if (window.visualViewport) {
+                document.getElementById('visual-width').textContent = `${window.visualViewport.width}px`;
+                document.getElementById('visual-height').textContent = `${window.visualViewport.height}px`;
+                document.getElementById('visual-offset-top').textContent = `${window.visualViewport.offsetTop}px`;
+                document.getElementById('visual-offset-left').textContent = `${window.visualViewport.offsetLeft}px`;
+                document.getElementById('visual-scale').textContent = window.visualViewport.scale.toFixed(2);
+                document.getElementById('visual-page-top').textContent = `${window.visualViewport.pageTop}px`;
+            } else {
+                ['visual-width', 'visual-height', 'visual-offset-top', 'visual-offset-left', 'visual-scale', 'visual-page-top'].forEach(id => {
+                    document.getElementById(id).textContent = 'Not supported';
+                });
+            }
+            
+            // Calculated measurements
+            const layoutHeight = document.documentElement.clientHeight;
+            const visualHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+            const heightDiff = layoutHeight - visualHeight;
+            
+            document.getElementById('viewport-diff').textContent = `${heightDiff}px`;
+            document.getElementById('available-height').textContent = `${visualHeight}px`;
+            document.getElementById('scroll-position').textContent = `(${window.scrollX}, ${window.scrollY})`;
+            document.getElementById('device-pixel-ratio').textContent = window.devicePixelRatio.toFixed(2);
+        }
+
+        // Simulate keyboard appearance
+        function simulateKeyboard() {
+            log('⌨️ Simulating keyboard appearance');
+            setObscuredInsets(0, 0, 300, 0);
+            
+            // Focus on text input to potentially trigger real keyboard
+            const textInput = document.getElementById('text-input');
+            textInput.focus();
+        }
+
+        // Event listeners
+        function setupEventListeners() {
+            // Visual viewport events
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', () => {
+                    log('👁️ Visual viewport resized');
+                    updateViewportInfo();
+                });
+                
+                window.visualViewport.addEventListener('scroll', () => {
+                    log('👁️ Visual viewport scrolled');
+                    updateViewportInfo();
+                });
+            }
+            
+            // Window events
+            window.addEventListener('resize', () => {
+                log('🪟 Window resized');
+                updateViewportInfo();
+            });
+            
+            window.addEventListener('orientationchange', () => {
+                log('📱 Orientation changed');
+                setTimeout(() => {
+                    updateViewportInfo();
+                    log('📊 Measurements updated after orientation change');
+                }, 500);
+            });
+            
+            window.addEventListener('scroll', () => {
+                updateViewportInfo();
+            });
+            
+            // Input events
+            ['text-input', 'email-input', 'textarea', 'select'].forEach(id => {
+                const element = document.getElementById(id);
+                element.addEventListener('focus', () => {
+                    log(`🎯 Input focused: ${id}`);
+                    setTimeout(updateViewportInfo, 300);
+                });
+                
+                element.addEventListener('blur', () => {
+                    log(`🎯 Input blurred: ${id}`);
+                    setTimeout(updateViewportInfo, 300);
+                });
+            });
+            
+            // Message listener for parent communication
+            window.addEventListener('message', (event) => {
+                log(`📨 Received message: ${JSON.stringify(event.data)}`);
+                if (event.data.type === 'obscuredInsetsChanged') {
+                    updateViewportInfo();
+                }
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            log('🚀 Page loaded, initializing...');
+            detectWebKit();
+            setupEventListeners();
+            updateViewportInfo();
+            
+            // Initial measurements
+            setTimeout(() => {
+                updateViewportInfo();
+                log('📊 Initial measurements completed');
+            }, 500);
+        });
+
+        // Export functions for console testing
+        window.testFunctions = {
+            setObscuredInsets,
+            updateViewportInfo,
+            simulateKeyboard,
+            log,
+            clearLog
+        };
+    </script>
+</body>
+</html>
