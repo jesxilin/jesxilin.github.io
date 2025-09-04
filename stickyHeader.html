@@ -2,14 +2,26 @@
 <html>
 <head>
     <style>
-        html {
+        /* html {
             width: 402px;
-        }
+        } */
         body {
             margin: 0;
             font-family: Arial, sans-serif;
             font-size: large;
-            width: 402px;
+            width: 100%;
+        }
+
+        .d-flex {
+            display: flex !important;
+        }
+
+        .flex-auto { 
+            flex: auto !important;
+        }
+
+        .flex-column {
+            flex-direction: column !important;
         }
         
         .sticky-header {
@@ -19,20 +31,25 @@
             border-bottom: 1px solid #ccc;
             padding: 10px;
             display: none;
+            z-index: 1000;
+            width: auto;
         }
         
         .sticky-header.show {
             display: block;
-            /* position: static !important; */
+            position: static !important;
             /* width: 100% !important; */
             width: 618px;
+            border: 10px solid black;
             max-width: none;
         }
         
         .content {
             height: 200vh;
             padding: 20px;
-            /* display: flex; */
+            display: flex;
+            border: 2px dashed blue;
+            box-sizing: border-box;
         }
         
         .trigger-point {
@@ -43,11 +60,9 @@
     </style>
 </head>
 <body>
-    <div class="sticky-header" id="header">
-        Sticky Header - Navigation Menu
-    </div>
     
-    <div class="content flex-items-center">
+    
+    <div class="content d-flex flex-column flex-auto">
         <div class="trigger-point">
             <h1>Scroll down past this section</h1>
             <p>The sticky header will appear when you scroll past this gray area.</p>
@@ -58,6 +73,38 @@
         <p>More text content to make the page longer.</p>
         <p>The sticky header should be visible now if you've scrolled far enough.</p>
 
+        <div class="sticky-header d-flex" id="header">
+            Sticky Header - Navigation Menu
+        </div>
+        <p>More content here...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
+        <p>Keep scrolling...</p>
     </div>
 
     <script>
