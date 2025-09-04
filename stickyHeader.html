@@ -1,172 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sticky Header Test Page</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
+            margin: 0;
             font-family: Arial, sans-serif;
-            line-height: 1.6;
         }
-
-        .header {
+        
+        .sticky-header {
             position: fixed;
             top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: white;
-            padding: 15px 30px;
-            width: 1000px;
-            text-align: center;
-            border-radius: 0 0 10px 10px;
-            z-index: 1000;
-            opacity: 0;
-            display: flex;
-            visibility: hidden;
+            width: 100%;
+            background: white;
+            border-bottom: 1px solid #ccc;
+            padding: 10px;
+            display: none;
         }
-
-        .header.visible {
-            opacity: 1;
-            visibility: visible;
+        
+        .sticky-header.show {
+            display: block;
         }
-
-        .hero {
-            height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            text-align: center;
-        }
-
+        
         .content {
-            padding: 50px 20px;
-            max-width: 800px;
-            margin: 0 auto;
+            height: 200vh;
+            padding: 20px;
         }
-
-        .section {
-            margin-bottom: 60px;
-            padding: 40px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-
-        .section h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 2rem;
-        }
-
-        .section p {
-            color: #666;
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-        }
-
+        
         .trigger-point {
-            height: 2px;
-            background: #e74c3c;
-            margin: 100px 0;
-            position: relative;
-        }
-
-        .trigger-point::before {
-            content: "Scroll past this point to see the header";
-            position: absolute;
-            top: -30px;
-            left: 0;
-            color: #e74c3c;
-            font-weight: bold;
-            font-size: 0.9rem;
+            height: 300px;
+            background: #f0f0f0;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="header" id="stickyHeader">
-        <h3>Sticky Navigation Header</h3>
+    <div class="sticky-header" id="header">
+        Sticky Header - Navigation Menu
     </div>
-
-    <div class="hero">
-        <h1>Scroll Down to See the Magic</h1>
-    </div>
-
+    
     <div class="content">
-        <div class="section">
-            <h2>Section 1</h2>
-            <p>This is the first section of content. Keep scrolling to see the sticky header appear when you pass the trigger point.</p>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+        <div class="trigger-point">
+            <h1>Scroll down past this section</h1>
+            <p>The sticky header will appear when you scroll past this gray area.</p>
         </div>
-
-        <div class="trigger-point"></div>
-
-        <div class="section">
-            <h2>Section 2</h2>
-            <p>You should now see the sticky header at the top of the page! Notice how it becomes wider as you continue scrolling.</p>
-            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.</p>
-        </div>
-
-        <div class="section">
-            <h2>Section 3</h2>
-            <p>The header should now be in its wider state with a darker background and more prominent styling.</p>
-            <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis.</p>
-        </div>
-
-        <div class="section">
-            <h2>Section 4</h2>
-            <p>Continue scrolling to see how the header maintains its position and styling throughout the page.</p>
-            <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores.</p>
-        </div>
-
-        <div class="section">
-            <h2>Section 5</h2>
-            <p>This is the final section. Try scrolling back up to see the header disappear when you reach the top.</p>
-            <p>Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit.</p>
-        </div>
+        
+        <p>More content here...</p>
+        <p>Keep scrolling...</p>
+        <p>More text content to make the page longer.</p>
+        <p>The sticky header should be visible now if you've scrolled far enough.</p>
     </div>
 
     <script>
-        const header = document.getElementById('stickyHeader');
-        const triggerPoint = document.querySelector('.trigger-point');
-        
-        let triggerOffset = 0;
-        let wideHeaderOffset = 0;
+        const header = document.getElementById('header');
+        const triggerPoint = 300;
 
-        function calculateOffsets() {
-            const triggerRect = triggerPoint.getBoundingClientRect();
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            triggerOffset = triggerRect.top + scrollTop;
-            wideHeaderOffset = triggerOffset + 300;
-        }
-
-        function handleScroll() {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            
-            if (scrollTop > triggerOffset) {
-                header.classList.add('visible');
-                header.classList.add('wide');
-                
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > triggerPoint) {
+                header.classList.add('show');
             } else {
-                header.classList.remove('visible', 'wide');
+                header.classList.remove('show');
             }
-        }
-
-        window.addEventListener('load', calculateOffsets);
-        window.addEventListener('resize', calculateOffsets);
-        window.addEventListener('scroll', handleScroll);
+        });
     </script>
 </body>
 </html>
