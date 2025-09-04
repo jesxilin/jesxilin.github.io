@@ -9,9 +9,8 @@
         }
         
         .sticky-header {
-            position: fixed;
+            /* position: fixed; */
             top: 0;
-            width: 250%;
             background: yellow;
             border-bottom: 1px solid #ccc;
             padding: 10px;
@@ -20,6 +19,8 @@
         
         .sticky-header.show {
             display: block;
+            position: static !important;
+            width: 100% !important;
         }
         
         .content {
