@@ -63,6 +63,12 @@
             background: #f0f0f0;
             margin-bottom: 20px;
         }
+
+        #scroll-position {
+            position:fixed;
+            right: 0px;
+            top: 0px;
+        }
     </style>
 </head>
 <body>
@@ -74,7 +80,7 @@
                 <p>The sticky header will appear when you scroll past this gray area.</p>
             </div>
             
-            <p>More content here...</p>
+            <p><span id="scroll-position"></span></p>
             <p>Keep scrolling...</p>
             <p>More text content to make the page longer.</p>
             <p>The sticky header should be visible now if you've scrolled far enough.</p>
@@ -119,6 +125,7 @@
         const triggerPoint = 300;
 
         window.addEventListener('scroll', function() {
+            document.getElementById('scroll-position').innerHTML = "(" + window.scrollX + ", " + window.scrollY + ")";
             if (window.scrollY > triggerPoint) {
                 header.classList.add('show');
             } else {
