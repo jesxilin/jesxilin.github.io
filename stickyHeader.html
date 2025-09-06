@@ -2,30 +2,10 @@
 <html>
 <head>
     <style>
-        * {
-            word-wrap: break-word;
-        }
         body {
             margin: 0;
             font-family: Arial, sans-serif;
             font-size: large;
-            width: 100%;
-        }
-
-        .d-flex {
-            display: flex !important;
-        }
-
-        p {
-            flex: 1;
-        }
-
-        .flex-auto { 
-            flex: auto !important;
-        }
-
-        .flex-column {
-            flex-direction: column !important;
         }
         
         .sticky-header {
@@ -41,19 +21,13 @@
         
         .sticky-header.show {
             display: block;
-            position: static !important;
-            /* width: 100% !important; */
             width: 1000px;
-            /* height: 60px; */
             border: 10px solid black;
             max-width: none;
-            /* min-width: 0 !important; */
         }
         
         .content {
-            height: 200vh;
             padding: 20px;
-            display: flex;
             border: 2px dashed blue;
             box-sizing: border-box;
         }
@@ -72,7 +46,7 @@
     </style>
 </head>
 <body>
-            <div class="content d-flex flex-column flex-auto">
+        <div class="content">
             <div class="trigger-point">
                 <h1>Scroll down past this section</h1>
                 <p>The sticky header will appear when you scroll past this gray area.</p>
@@ -83,7 +57,7 @@
             <p>More text content to make the page longer.</p>
             <p>The sticky header should be visible now if you've scrolled far enough.</p>
 
-            <div class="sticky-header d-flex" id="header">
+            <div class="sticky-header" id="header">
                 Sticky Header - Navigation Menu
             </div>
             <p>More content here...</p>
@@ -116,6 +90,8 @@
             <p>Keep scrolling...</p>
             <p>Keep scrolling...</p>
         </div>
+    </turbo-frame>
+
     <script>
         const header = document.getElementById('header');
         const triggerPoint = 300;
