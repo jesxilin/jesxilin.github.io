@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <style>
+        #item1 {
+            background-color: yellow;
+            width: 100px;
+            height: 100px;
+            border: 1px black dotted;
+        }
+
+        #item2 {
+            background-color: pink;
+            width: 100px;
+            height: 100px;
+            border: 1px black dotted;
+        }
+        #parent-dropzone {
+            width: 200px;
+            height:250px;
+            background-color: rgb(190, 231, 231);
+        }
+    </style>
+</head>
+<body>
+    <p id="status"></p>
+
+    <div draggable="true" id="item1">Item 1 - Try to drag to iframe</div>
+    <div draggable="true" id="item2">Item 2 - Try to drag to iframe</div>
+    
+    <p>Parent drop zone:</p>
+    <div id="parent-dropzone">Drop items here</div>
+
+    <br>    
+    <script>
+        // Make items draggable
+        document.querySelectorAll('[draggable="true"]').forEach(item => {
+            item.addEventListener('dragstart', function(e) {
+                e.dataTransfer.setData('text/plain', this.textContent);
+                console.log('Drag started:', this.textContent);
+                document.getElementById('status').innerHTML = 'Drag started: ' + this.textContent;
+            });
+        });
+        
+        // Parent drop zone (same origin - should work)
+        const parentDropzone = document.getElementById('parent-dropzone');
+        
+        parentDropzone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.backgroundColor = 'pink';
+            const data = e.dataTransfer.getData('text/plain');
+            document.getElementById('status').innerHTML = 'Drag over';
+        });
+        
+        parentDropzone.addEventListener('dragleave', function(e) {
+            this.style.backgroundColor = '';
+            document.getElementById('status').innerHTML = '';
+        });
+        
+        parentDropzone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            document.getElementById('status').innerHTML = 'Drag dropped';
+            const data = e.dataTransfer.getData('text/plain');
+            this.innerHTML = 'Dropped: ' + data;
+            this.style.backgroundColor = 'yellow';
+            console.log("Dropped processed with text: " + data);
+            alert("Dropped processed with text: " + data);
+        });
+    </script>
+</body>
+</html>
