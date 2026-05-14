@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html {
+            font-size: 0.1302083vmin !important;
+            height: 100%;
+        }
+
+        body {
+            height: 100%;
+            background-color: red;
+            overflow: hidden;
+            position: relative;
+            /* The JS will override width/height/margins below */
+        }
+
+        #container {
+            width: 100%;
+            height: 100%;
+            background-color: blue;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            border: 5rem solid yellow;
+        }
+
+        .label {
+            background: white;
+            color: black;
+            font-family: sans-serif;
+            font-size: 30rem;
+            padding: 10rem;
+            margin: 20rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div class="label">TOP VISUAL AREA</div>
+        <div style="color: white; font-size: 40rem; text-align: center;">
+            ASPECT RATIO TEST<br>
+            <span id="debug-info" style="font-size: 20rem; color: yellow;"></span>
+        </div>
+        <div class="label">BOTTOM VISUAL AREA</div>
+    </div>
+
+    <script>
+        function applyProductionLayout() {
+            let width, height, margin;
+            
+            // window.orientation is 0 initially
+            if(window.orientation == 90 || window.orientation == (-90)){
+                width = screen.height;
+                height = screen.width;
+            } else {
+                width = screen.width;
+                height = screen.height;
+            }
+            
+            if((width > height) && (width/4)*3 !== height){
+                margin = (width - ((height/3)*4)) / 2;
+                document.body.style.width = "133.33vh";
+                document.body.style.marginLeft = margin + "rem";
+                document.body.style.marginRight = margin + "rem";
+            } else if((width < height) && (width/4)*3 !== height){
+                margin = (height - ((width/3)*4)) / 2;
+                document.body.style.height = "133.33vw";
+                document.body.style.marginTop = margin + "rem";
+                document.body.style.marginBottom = margin + "rem";
+            }
+        }
+
+        window.onload = applyProductionLayout;
+        window.onorientationchange = function() {
+            location.reload(); // Refresh to re-run calc on rotate
+        };
+    </script>
+</body>
+</html>
