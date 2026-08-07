@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Datalist Test Page</title>
+  <style>
+    #datalist-block {
+      margin: 40px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Fruit Picker</h1>
+  <div id="datalist-block">
+    <label for="fruit">Choose a fruit:</label>
+    <input list="fruits" id="fruit" name="fruit" placeholder="Type a fruit" autocomplete="off">
+    <datalist id="fruits"></datalist>
+  </div>
+
+  <script>
+    const fruits = [
+      "Apple", "Banana", "Cherry", "Grape", "Mango",
+      "Orange", "Pineapple", "Strawberry", "Watermelon",
+      "Kiwi", "DragonFruit", "Peach", "Lychee"
+    ];
+
+    const input = document.getElementById("fruit");
+    const datalist = document.getElementById("fruits");
+
+    input.addEventListener("input", () => {
+      const query = input.value.trim().toLowerCase();
+
+      // No text yet: keep the list empty so nothing shows on focus.
+      if (query === "") {
+        datalist.innerHTML = "";
+        return;
+      }
+
+      const matches = fruits.filter(fruit => fruit.toLowerCase().includes(query));
+      datalist.innerHTML = matches
+        .map(fruit => `<option value="${fruit}"></option>`)
+        .join("");
+    });
+  </script>
+</body>
+</html>
