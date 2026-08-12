@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, interactive-widget=resizes-content">
+<title>resizes-content + overflowing text in overflow:hidden</title>
+<style>
+    html, body {
+        overflow: hidden;
+        height: 100%;
+        margin: 0;
+        font: 13px -apple-system, sans-serif;
+    }
+
+    /* Fills the layout viewport. With interactive-widget=resizes-content this
+       shrinks when the keyboard appears, clipping more of the text below. */
+    #box {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        border: 3px solid crimson;
+    }
+
+    #status {
+        flex: none;
+        padding: 8px;
+        background: crimson;
+        color: white;
+    }
+
+    #status table { border-collapse: collapse; }
+    #status td { padding: 1px 8px 1px 0; }
+    #status td:first-child { opacity: 0.85; }
+    #status td:last-child { font-variant-numeric: tabular-nums; font-weight: 600; }
+
+    input {
+        width: 100%;
+        height: 44px;
+        font-size: 17px;
+        box-sizing: border-box;
+        margin-bottom: 8px;
+    }
+
+    /* The overflowing text lives here. No scrollbar, no way to reach the
+       clipped lines — that is the point of the test. */
+    #content {
+        flex: 1;
+        overflow: hidden;
+        font-size: 16px;
+        line-height: 28px;
+    }
+
+    .line {
+        padding: 0 8px;
+        white-space: nowrap;
+    }
+    .line:nth-child(even) { background: #eee; }
+    .line.clipped { color: crimson; }
+    .last-visible { outline: 2px solid blue; outline-offset: -2px; }
+</style>
+</head>
+<body>
+
+<div id="box">
+    <div id="status">
+        <input id="input" type="text" placeholder="Tap here to show the keyboard">
+        <table>
+            <tr><td>visualViewport.height</td><td id="vvHeight"></td></tr>
+            <tr><td>#content visible height</td><td id="contentHeight"></td></tr>
+            <tr><td>last fully visible line</td><td id="lastVisible"></td></tr>
+            <tr><td>lines clipped (unreachable)</td><td id="clippedCount"></td></tr>
+            <tr><td>#content scrollHeight / clientHeight</td><td id="overflowAmount"></td></tr>
+            <tr><td>scrollTop (page / content)</td><td id="scrollTops"></td></tr>
+        </table>
+    </div>
+
+    <div id="content"></div>
+</div>
+
+<script>
+const TOTAL_LINES = 60;
+const content = document.getElementById("content");
+
+for (let i = 1; i <= TOTAL_LINES; i++) {
+    const line = document.createElement("div");
+    line.className = "line";
+    line.textContent = String(i).padStart(2, "0") + " — this line of text overflows the container";
+    content.appendChild(line);
+}
+
+const round = n => Math.round(n * 100) / 100;
+
+function update() {
+    const lines = content.querySelectorAll(".line");
+    const contentRect = content.getBoundingClientRect();
+
+    // Text can be hidden two ways: clipped by #content, or pushed below the
+    // visual viewport by the keyboard. Take whichever edge is higher.
+    const visibleBottom = Math.min(contentRect.bottom, window.visualViewport.height);
+
+    let lastVisible = 0;
+    lines.forEach((line, index) => {
+        const bottom = line.getBoundingClientRect().bottom;
+        const isVisible = bottom <= visibleBottom + 1;
+        line.classList.toggle("clipped", !isVisible);
+        line.classList.remove("last-visible");
+        if (isVisible)
+            lastVisible = index + 1;
+    });
+
+    if (lastVisible)
+        lines[lastVisible - 1].classList.add("last-visible");
+
+    document.getElementById("vvHeight").textContent = round(window.visualViewport.height);
+    document.getElementById("contentHeight").textContent = round(Math.max(0, visibleBottom - contentRect.top));
+    document.getElementById("lastVisible").textContent = lastVisible + " of " + TOTAL_LINES;
+    document.getElementById("clippedCount").textContent = (TOTAL_LINES - lastVisible);
+    document.getElementById("overflowAmount").textContent =
+        content.scrollHeight + " / " + content.clientHeight +
+        " (" + Math.max(0, content.scrollHeight - content.clientHeight) + "px hidden)";
+    document.getElementById("scrollTops").textContent =
+        document.scrollingElement.scrollTop + " / " + content.scrollTop;
+}
+
+update();
+addEventListener("resize", update);
+addEventListener("scroll", update);
+visualViewport.addEventListener("resize", update);
+visualViewport.addEventListener("scroll", update);
+setInterval(update, 250);
+</script>
+
+</body>
+</html>

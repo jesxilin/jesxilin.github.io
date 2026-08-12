@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, interactive-widget=resizes-content">
+<title>resizes-content + position:fixed header, footer, and side tab</title>
+<style>
+    body {
+        margin: 0;
+        font: 13px -apple-system, sans-serif;
+        /* Keep page content clear of the fixed header and footer. */
+        padding: 60px 0 60px;
+    }
+
+    #header, #footer, #tab {
+        position: fixed;
+        background: crimson;
+        color: white;
+        font-weight: 600;
+        padding: 8px;
+        box-sizing: border-box;
+        z-index: 1;
+    }
+
+    #header {
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 52px;
+    }
+
+    #footer {
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 52px;
+    }
+
+    /* Third fixed element: vertically centered against the layout viewport, so
+       it should move up as the viewport shrinks. */
+    #tab {
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        border-radius: 8px 0 0 8px;
+        writing-mode: vertical-rl;
+    }
+
+    /* Flipped styling when the element has left the visual viewport. */
+    .offscreen {
+        background: white !important;
+        color: crimson !important;
+        outline: 2px solid crimson;
+    }
+
+    main { padding: 0 8px; }
+
+    input {
+        width: 100%;
+        height: 44px;
+        font-size: 17px;
+        box-sizing: border-box;
+        margin-bottom: 12px;
+    }
+
+    table { border-collapse: collapse; }
+    td { padding: 1px 8px 1px 0; }
+    td:first-child { color: #555; }
+    td:last-child { font-variant-numeric: tabular-nums; }
+    .bad { color: crimson; font-weight: 600; }
+    .animating { color: #b06000; font-weight: 600; }
+
+    /* Tall content so the page scrolls and the fixed elements can be verified
+       to stay put. */
+    .filler {
+        height: 120px;
+        margin: 8px 0;
+        background: #eee;
+        border-left: 3px solid silver;
+        padding: 4px 8px;
+        color: #666;
+    }
+</style>
+</head>
+<body>
+
+<div id="header">FIXED HEADER (top: 0)</div>
+<div id="tab">FIXED MIDDLE (top: 50%)</div>
+<div id="footer">FIXED FOOTER (bottom: 0)</div>
+
+<main>
+    <input id="input" type="text" placeholder="Tap here to show the keyboard">
+
+    <table>
+        <tr><td>state</td><td id="state"></td></tr>
+        <tr><td>peak gap during last transition</td><td id="peakGap"></td></tr>
+        <tr><td>visualViewport.height</td><td id="vvHeight"></td></tr>
+        <tr><td>visualViewport.offsetTop</td><td id="vvOffsetTop"></td></tr>
+        <tr><td>documentElement.clientHeight</td><td id="clientHeight"></td></tr>
+        <tr><td>scrollY</td><td id="scrollY"></td></tr>
+        <tr><td>header top / bottom</td><td id="headerRect"></td></tr>
+        <tr><td>middle top / bottom</td><td id="tabRect"></td></tr>
+        <tr><td>footer top / bottom</td><td id="footerRect"></td></tr>
+        <tr><td>footer gap to viewport bottom</td><td id="footerGap"></td></tr>
+    </table>
+</main>
+
+<script>
+const round = n => Math.round(n * 100) / 100;
+const fixedElements = {
+    header: document.getElementById("header"),
+    tab: document.getElementById("tab"),
+    footer: document.getElementById("footer"),
+};
+
+// The keyboard animates over roughly 300ms. During that window the visual
+// viewport shrinks progressively while the layout viewport (which repositions
+// fixed elements) changes in one discrete step, so the two legitimately
+// disagree mid-flight. Only judge pass/fail once things have settled.
+const SETTLE_MS = 400;
+let lastChangeTime = 0;
+let peakGap = 0;
+let wasSettled = true;
+
+function noteViewportChange() {
+    if (wasSettled) {
+        // A new transition is starting — reset the peak tracker.
+        peakGap = 0;
+        wasSettled = false;
+    }
+    lastChangeTime = Date.now();
+}
+
+function update() {
+    const viewportTop = window.visualViewport.offsetTop;
+    const viewportBottom = viewportTop + window.visualViewport.height;
+    const settled = Date.now() - lastChangeTime > SETTLE_MS;
+
+    if (settled)
+        wasSettled = true;
+
+    for (const [name, element] of Object.entries(fixedElements)) {
+        const rect = element.getBoundingClientRect();
+        const offscreen = rect.bottom > viewportBottom + 1 || rect.top < viewportTop - 1;
+
+        // Only flag a fixed element once the transition has finished; a
+        // transient offset mid-animation is expected, not a failure.
+        element.classList.toggle("offscreen", offscreen && settled);
+
+        const cell = document.getElementById(name + "Rect");
+        cell.textContent = round(rect.top) + " / " + round(rect.bottom) + (offscreen && settled ? "  (offscreen!)" : "");
+        cell.className = offscreen && settled ? "bad" : "";
+    }
+
+    const footerRect = fixedElements.footer.getBoundingClientRect();
+    const gap = viewportBottom - footerRect.bottom;
+
+    if (Math.abs(gap) > Math.abs(peakGap))
+        peakGap = gap;
+
+    const gapCell = document.getElementById("footerGap");
+    // With interactive-widget=resizes-content the footer should settle flush
+    // against the bottom of the shrunken viewport, so this ends near 0.
+    gapCell.textContent = round(gap) + "px";
+    gapCell.className = settled && Math.abs(gap) > 1 ? "bad" : "";
+
+    const stateCell = document.getElementById("state");
+    stateCell.textContent = settled ? "settled" : "animating…";
+    stateCell.className = settled ? "" : "animating";
+
+    // Non-zero peak just means the transition wasn't instantaneous. It is
+    // informational; the settled gap above is the actual pass/fail.
+    document.getElementById("peakGap").textContent = round(peakGap) + "px";
+
+    document.getElementById("vvHeight").textContent = round(window.visualViewport.height);
+    document.getElementById("vvOffsetTop").textContent = round(viewportTop);
+    document.getElementById("clientHeight").textContent = document.documentElement.clientHeight;
+    document.getElementById("scrollY").textContent = round(window.scrollY);
+}
+
+const main = document.querySelector("main");
+for (let i = 1; i <= 12; i++) {
+    const filler = document.createElement("div");
+    filler.className = "filler";
+    filler.textContent = "Scrollable content block " + i + " — the fixed elements should not move while scrolling.";
+    main.appendChild(filler);
+}
+
+update();
+addEventListener("resize", () => { noteViewportChange(); update(); });
+addEventListener("scroll", update);
+visualViewport.addEventListener("resize", () => { noteViewportChange(); update(); });
+visualViewport.addEventListener("scroll", () => { noteViewportChange(); update(); });
+setInterval(update, 100);
+</script>
+
+</body>
+</html>

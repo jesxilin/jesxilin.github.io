@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, interactive-widget=resizes-content">
+<title>resizes-content + overflow:hidden</title>
+<style>
+    html, body {
+        overflow: hidden;
+        height: 100%;
+        margin: 0;
+        font: 13px -apple-system, sans-serif;
+    }
+
+    /* Fills the layout viewport. With interactive-widget=resizes-content this
+       should shrink when the keyboard comes up, keeping the footer visible. */
+    #box {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: linear-gradient(silver, #eee);
+        box-sizing: border-box;
+        border: 3px solid crimson;
+    }
+
+    header, footer {
+        flex: none;
+        padding: 8px;
+        background: crimson;
+        color: white;
+        font-weight: 600;
+    }
+
+    main {
+        flex: 1;
+        overflow: hidden;
+        padding: 8px;
+    }
+
+    input {
+        width: 100%;
+        height: 44px;
+        font-size: 17px;
+        box-sizing: border-box;
+        margin-bottom: 12px;
+    }
+
+    table { border-collapse: collapse; }
+    td { padding: 1px 8px 1px 0; }
+    td:first-child { color: #555; }
+    td:last-child { font-variant-numeric: tabular-nums; }
+    .bad { color: crimson; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div id="box">
+    <header>TOP of 100%-height box</header>
+
+    <main>
+        <input id="input" type="text" placeholder="Tap here to show the keyboard">
+
+        <table>
+            <tr><td>window.innerHeight</td><td id="innerHeight"></td></tr>
+            <tr><td>documentElement.clientHeight</td><td id="clientHeight"></td></tr>
+            <tr><td>#box height</td><td id="boxHeight"></td></tr>
+            <tr><td>visualViewport.height</td><td id="vvHeight"></td></tr>
+            <tr><td>visualViewport.offsetTop</td><td id="vvOffsetTop"></td></tr>
+            <tr><td>scrollHeight / clientHeight</td><td id="scrollable"></td></tr>
+            <tr><td>scrollTop</td><td id="scrollTop"></td></tr>
+        </table>
+    </main>
+
+    <footer id="footer">BOTTOM of 100%-height box &mdash; should stay visible</footer>
+</div>
+
+<script>
+const round = n => Math.round(n * 100) / 100;
+
+function update() {
+    const scroller = document.scrollingElement;
+
+    document.getElementById("innerHeight").textContent = window.innerHeight;
+    document.getElementById("clientHeight").textContent = document.documentElement.clientHeight;
+    document.getElementById("boxHeight").textContent = round(document.getElementById("box").getBoundingClientRect().height);
+    document.getElementById("vvHeight").textContent = round(window.visualViewport.height);
+    document.getElementById("vvOffsetTop").textContent = round(window.visualViewport.offsetTop);
+
+    // With overflow: hidden, shrinking the viewport should not make the page scrollable.
+    const scrollableCell = document.getElementById("scrollable");
+    const overflows = scroller.scrollHeight > scroller.clientHeight;
+    scrollableCell.textContent = scroller.scrollHeight + " / " + scroller.clientHeight + (overflows ? "  (overflowing!)" : "");
+    scrollableCell.className = overflows ? "bad" : "";
+
+    const scrollTopCell = document.getElementById("scrollTop");
+    scrollTopCell.textContent = scroller.scrollTop;
+    scrollTopCell.className = scroller.scrollTop ? "bad" : "";
+
+    // Turn the footer red-on-white if it has been pushed outside the visual viewport.
+    const footer = document.getElementById("footer");
+    const obscured = footer.getBoundingClientRect().bottom > window.visualViewport.height + 1;
+    footer.style.background = obscured ? "white" : "crimson";
+    footer.style.color = obscured ? "crimson" : "white";
+    footer.textContent = obscured
+        ? "BOTTOM is obscured by the keyboard"
+        : "BOTTOM of 100%-height box — should stay visible";
+}
+
+update();
+addEventListener("resize", update);
+addEventListener("scroll", update);
+visualViewport.addEventListener("resize", update);
+visualViewport.addEventListener("scroll", update);
+setInterval(update, 250);
+</script>
+
+</body>
+</html>
